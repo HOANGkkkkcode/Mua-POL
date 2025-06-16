@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Mua POL</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 80%;
+    }
+    button {
+      background-color: #2196F3;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #0b7dda;
+    }
+    .hidden { display: none; }
+    .note {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🪙 Mua POL</h2>
+
+    <div class="note">
+      <p>🔹 POL là đồng tiền ảo dùng để làm phí giao dịch BRIL-S.</p>
+      <p>🔹 Tỉ giá cố định: 2 POL = 20.000 VNĐ.</p>
+      <p>🔹 Bạn cần tham gia nhóm Zalo để được xác nhận giao dịch thủ công.</p>
+    </div>
+
+    <div id="loginArea">
+      <h3>Đăng nhập hoặc Đăng ký</h3>
+      <input type="text" id="username" placeholder="Tên người dùng"><br>
+      <input type="password" id="password" placeholder="Mật khẩu"><br>
+      <button onclick="register()">Đăng ký</button>
+      <button onclick="login()">Đăng nhập</button>
+    </div>
+
+    <div id="mainArea" class="hidden">
+      <h3>Xin chào, <span id="currentUser"></span>!</h3>
+
+      <h4>Mua POL</h4>
+      <input type="number" id="amountInput" placeholder="Số lượng POL" oninput="validateAmount()"><br>
+      <button id="buyBtn" onclick="confirmAction()" disabled>Mua POL</button>
+      <p style="color: #ccc; font-size: 14px;">Giá mua tối thiểu: 20.000 VNĐ = 2 POL</p>
+    </div>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = null;
+
+    function saveUsers() {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function updateUI() {
+      if (!currentUser) return;
+      document.getElementById("loginArea").classList.add("hidden");
+      document.getElementById("mainArea").classList.remove("hidden");
+      document.getElementById("currentUser").innerText = currentUser;
+    }
+
+    function register() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value;
+      if (users[user]) return alert("Tài khoản đã tồn tại!");
+      users[user] = { password: pass };
+      saveUsers();
+      alert("Đăng ký thành công. Đăng nhập để giao dịch.");
+    }
+
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value;
+      if (!users[user] || users[user].password !== pass) return alert("Sai tài khoản hoặc mật khẩu");
+      currentUser = user;
+      updateUI();
+    }
+
+    function validateAmount() {
+      const amount = parseInt(document.getElementById("amountInput").value);
+      document.getElementById("buyBtn").disabled = isNaN(amount) || amount < 2;
+    }
+
+    function confirmAction() {
+      const amount = parseInt(document.getElementById("amountInput").value);
+      if (isNaN(amount) || amount <= 0) return alert("Số lượng không hợp lệ");
+      if (amount < 2) return alert("Số lượng tối thiểu để mua là 2 POL (20.000 VNĐ)");
+
+      const confirmMsg = `Xác nhận mua ${amount} POL?`;
+      if (confirm(confirmMsg)) {
+        const groupLink = "https://zalo.me/g/gbewvu214";
+        window.open(groupLink, "_blank");
+      }
+    }
+  </script>
+</body>
+</html>
